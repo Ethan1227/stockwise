@@ -77,3 +77,26 @@ def test_chat_llm_field_present():
     with TestClient(app) as client:
         data = _chat(client, "本周要补什么货？")
     assert data["llm"] in ("deepseek-v4-flash", "fallback")
+
+
+def test_skill_routing_and_thinking():
+    """技能库关键词路由 + 思考过程。"""
+    from app.core.db import SessionLocal
+    from app.services.qa_router import route_and_think
+    from app.services.skill_registry import match_skill, skill_index
+
+    assert match_skill("本周要补什么货？")["code"] == "replenish"
+    assert match_skill("哪些产品滞销？")["code"] == "slow"
+    assert match_skill("SK-2087 会断货吗？")["code"] == "stockout"
+    assert match_skill("预算还剩多少？")["code"] == "budget"
+    assert "备货建议" in skill_index()
+
+    db = SessionLocal()
+    try:
+        skill, result, thinking = route_and_think("本周要补什么货？", db)
+        assert skill["code"] == "replenish"
+        assert any(t["step"] == "意图识别" for t in thinking)
+        assert any(t["step"] == "调用模型" for t in thinking)
+        assert any(t["step"] == "可查询数据源" for t in thinking)
+    finally:
+        db.close()
