@@ -6,7 +6,6 @@ import {
   deleteOrder,
   generateOrders,
   listOrders,
-  PurchaseOrder,
   shipOrder,
 } from '../../api/purchase'
 

@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChatChip, sendChat } from '../../api/chat'
+import type { ChatChip } from '../../api/chat'
+import { sendChat } from '../../api/chat'
 
 interface Message {
   role: 'user' | 'ai'

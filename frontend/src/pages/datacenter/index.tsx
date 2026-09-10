@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { importCsv, ImportError, listDatasources } from '../../api/datasources'
+import type { ImportError } from '../../api/datasources'
+import { importCsv, listDatasources } from '../../api/datasources'
 
 interface ImportFeedback {
   source: string

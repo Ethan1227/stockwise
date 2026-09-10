@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { listSuggestions, Suggestion, triggerCalc, updateSuggestion } from '../../api/suggestions'
+import type { Suggestion } from '../../api/suggestions'
+import { listSuggestions, triggerCalc, updateSuggestion } from '../../api/suggestions'
 import { ScoreBadge } from '../../components/ui/Badge'
 
 const BANDS = ['立即补货', '常规', '观望', '停止补货']
