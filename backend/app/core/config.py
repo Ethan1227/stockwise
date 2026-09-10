@@ -18,6 +18,8 @@ DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_DB_PATH.as_posix()
 # 每日测算调度时间（可用环境变量覆盖，默认 06:30）
 CALC_CRON_HOUR = int(os.getenv("CALC_CRON_HOUR", "6"))
 CALC_CRON_MINUTE = int(os.getenv("CALC_CRON_MINUTE", "30"))
+# 一般/滞销预警邮件汇总发送时间（默认 18:00）
+EMAIL_DIGEST_HOUR = int(os.getenv("EMAIL_DIGEST_HOUR", "18"))
 
 # ---- 业务参数默认值（seed 时写入 settings 表，页面可改）----
 DEFAULT_SETTINGS = {
@@ -51,4 +53,14 @@ DEFAULT_SETTINGS = {
         {"event": "黑五网一", "event_date": "2026-11-27", "warehouse_deadline": "2026-11-10"},
         {"event": "圣诞季", "event_date": "2026-12-25", "warehouse_deadline": "2026-12-05"},
     ],
+    # 邮件通知（SMTP 未配置时自动降级为仅站内）
+    "smtp": {
+        "host": "",
+        "port": 465,
+        "user": "",
+        "password": "",
+        "from": "",
+        "to": [],
+    },
+    "email_digest_hour": 18,  # 一般/滞销预警邮件汇总发送时间
 }

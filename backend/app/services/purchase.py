@@ -122,6 +122,39 @@ def generate_purchase_orders(db: Session, sku_codes: list[str]) -> list[dict]:
     return [serialize(po) for po in orders]
 
 
+def create_manual_order(db: Session, supplier: str, dest_warehouse: str, status: str, items: list[dict], required_date=None) -> dict:
+    """手工补录采购单（历史/线下单据），shipped/confirmed 计入在途。"""
+    today = date.today()
+    seq = (db.query(func.count(PurchaseOrder.id)).filter(PurchaseOrder.po_no.like(f"PO-{today:%Y%m%d}-%")).scalar() or 0) + 1
+    normalized = [
+        {
+            "sku": i["sku"],
+            "qty": int(i.get("qty") or 0),
+            "unit_cost": float(i.get("unit_cost") or 0),
+            "amount": round(float(i.get("qty") or 0) * float(i.get("unit_cost") or 0), 2),
+        }
+        for i in items
+    ]
+    po = PurchaseOrder(
+        po_no=f"PO-{today:%Y%m%d}-{seq:02d}",
+        supplier=supplier,
+        status=status or "draft",
+        dest_warehouse=dest_warehouse or "",
+        required_date=required_date,
+        items_json={"items": normalized},
+        total_qty=sum(i["qty"] for i in normalized),
+        total_amount=round(sum(i["amount"] for i in normalized), 2),
+        suggest_air=False,
+        warning={},
+    )
+    db.add(po)
+    if status in ("confirmed", "shipped"):
+        for i in normalized:
+            _bump_inventory(db, i["sku"], delta_transit=i["qty"])
+    db.commit()
+    return serialize(po)
+
+
 def _bump_inventory(db: Session, sku_code: str, delta_transit: int = 0, delta_fba: int = 0, delta_wfs: int = 0):
     inv = db.query(InventorySnapshot).filter_by(sku=sku_code).order_by(InventorySnapshot.date.desc()).first()
     if inv is None:

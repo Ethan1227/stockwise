@@ -1,4 +1,5 @@
 """采购计划路由。"""
+from datetime import date
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db
 from app.core.exceptions import ok
 from app.models.purchase_order import PurchaseOrder
-from app.schemas.purchase import GenerateRequest
+from app.schemas.purchase import GenerateRequest, ManualOrderRequest
 from app.services import purchase
 
 router = APIRouter()
@@ -19,6 +20,17 @@ router = APIRouter()
 def generate(body: GenerateRequest, db: Session = Depends(get_db)):
     try:
         return ok(purchase.generate_purchase_orders(db, body.skus))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.post("/purchase-orders/manual")
+def create_manual(body: ManualOrderRequest, db: Session = Depends(get_db)):
+    """手工补录采购单（历史/线下单据）。"""
+    try:
+        items = [i.model_dump() for i in body.items]
+        required_date = date.fromisoformat(body.required_date) if body.required_date else None
+        return ok(purchase.create_manual_order(db, body.supplier, body.dest_warehouse, body.status, items, required_date))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

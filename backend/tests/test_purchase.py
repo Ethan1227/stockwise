@@ -89,3 +89,18 @@ def test_export_xlsx():
         exp = client.get(f"/api/purchase-orders/{po_id}/export")
     assert exp.status_code == 200
     assert "spreadsheetml" in exp.headers.get("content-type", "")
+
+
+def test_manual_order():
+    with TestClient(app) as client:
+        r = client.post("/api/purchase-orders/manual", json={
+            "supplier": "测试供应商",
+            "dest_warehouse": "FBA",
+            "status": "shipped",
+            "items": [{"sku": "SK-1023", "qty": 100, "unit_cost": 6.5}],
+        })
+    assert r.status_code == 200
+    data = r.json()["data"]
+    assert data["status"] == "shipped"
+    assert data["total_qty"] == 100
+    assert data["items"][0]["sku"] == "SK-1023"
