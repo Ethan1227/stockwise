@@ -70,3 +70,10 @@ def test_fallback():
     with TestClient(app) as client:
         data = _chat(client, "今天天气怎么样？")
     assert data["suggestions"]
+
+
+def test_chat_llm_field_present():
+    """回答体包含 llm 标记（deepseek-v4-flash 命中 或 fallback 兜底）。"""
+    with TestClient(app) as client:
+        data = _chat(client, "本周要补什么货？")
+    assert data["llm"] in ("deepseek-v4-flash", "fallback")

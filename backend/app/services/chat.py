@@ -1,4 +1,4 @@
-"""智能问答：规则化意图识别（MVP 不上大模型），关键词路由到 6 类 handler。"""
+"""智能问答：规则化意图识别 + DeepSeek LLM 自然语言生成（LLM 不可用时模板兜底）。"""
 import re
 from datetime import datetime
 
@@ -6,7 +6,7 @@ from app.models.alert import Alert
 from app.models.calc_result import CalcResult
 from app.models.purchase_order import PurchaseOrder
 from app.models.sku_master import SkuMaster
-from app.services import purchase
+from app.services import llm, purchase
 from app.services.settings import load_settings
 from app.services.suggestion import latest_calc_date
 
@@ -122,6 +122,28 @@ def handle_fallback() -> dict:
     return _ok("抱歉，我还没理解你的问题。你可以试试：\n" + "\n".join(f"- {s}" for s in SUGGESTIONS), [], [], SUGGESTIONS)
 
 
+SYSTEM_PROMPT = (
+    "你是「智备货 StockWise」的备货决策助手，服务于亚马逊/沃尔玛跨境卖家。"
+    "根据提供的业务数据，用简洁自然的简体中文回答用户问题。"
+    "不要编造数据；数据里没有的信息就如实说不知道。回答控制在 200 字以内。"
+)
+
+
+def _enhance_with_llm(text: str, result: dict) -> dict:
+    """用 LLM 将模板回答改写为自然语言；LLM 不可用/失败时保留模板（兜底）。"""
+    template = result["answer_md"]
+    enhanced = llm.generate(
+        SYSTEM_PROMPT,
+        f"用户问题：{text}\n\n业务数据（模板回答）：\n{template}\n\n请基于以上数据用自然语言回答。",
+    )
+    if enhanced:
+        result["answer_md"] = enhanced
+        result["llm"] = "deepseek-v4-flash"
+    else:
+        result["llm"] = "fallback"
+    return result
+
+
 def chat(db, text: str) -> dict:
     intent = detect_intent(text)
     sku_codes = [s.upper() for s in SKU_RE.findall(text)]
@@ -142,5 +164,6 @@ def chat(db, text: str) -> dict:
     else:
         result = handle_fallback()
 
+    result = _enhance_with_llm(text, result)
     result["answer_md"] += f"\n\n_数据来自今日 {datetime.now().strftime('%H:%M')} 测算，仅供参考_"
     return result

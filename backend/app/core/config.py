@@ -21,6 +21,11 @@ CALC_CRON_MINUTE = int(os.getenv("CALC_CRON_MINUTE", "30"))
 # 一般/滞销预警邮件汇总发送时间（默认 18:00）
 EMAIL_DIGEST_HOUR = int(os.getenv("EMAIL_DIGEST_HOUR", "18"))
 
+# DeepSeek LLM 配置（AI 问答助手）
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+
 # ---- 业务参数默认值（seed 时写入 settings 表，页面可改）----
 DEFAULT_SETTINGS = {
     # 基线日销权重：近30天 / 近90天 / 去年同期
