@@ -32,8 +32,8 @@ DEFAULT_SETTINGS = {
     "monthly_budget": 140000,
     # 预警阈值（四项）
     "alert_thresholds": {
-        "stockout_urgent_days": 35,   # 缺货紧急：可售天数 < 头程
-        "stockout_normal_days": 45,   # 缺货一般：可售天数 < 头程+安全
+        "stockout_urgent_days": 10,   # 缺货紧急：可售天数 < 安全天数（需空运）
+        "stockout_normal_days": 35,   # 缺货一般：可售天数 < 海运头程
         "slow_severe_turnover": 120,  # 滞销严重：周转 > 120 天
         "slow_severe_age": 180,       # 滞销严重：库龄 > 180 天
         "slow_mild_turnover": 60,     # 滞销轻度：周转 > 60 天

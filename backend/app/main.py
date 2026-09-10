@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import app.models  # noqa: F401  # 注册全部模型
-from app.api import calc, health, imports, suggestions
+from app.api import alerts, calc, health, imports, suggestions
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
 from app.core.scheduler import scheduler, start_scheduler
@@ -46,3 +46,4 @@ app.include_router(health.router, prefix="/api")
 app.include_router(imports.router, prefix="/api")
 app.include_router(calc.router, prefix="/api")
 app.include_router(suggestions.router, prefix="/api")
+app.include_router(alerts.router, prefix="/api")

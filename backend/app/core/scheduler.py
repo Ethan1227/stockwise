@@ -10,10 +10,12 @@ scheduler = BackgroundScheduler(timezone="Asia/Shanghai")
 def _daily_calc_job():
     from app.core.db import SessionLocal
     from app.engine.pipeline import run_calc
+    from app.services.alert import scan_alerts
 
     db = SessionLocal()
     try:
         run_calc(db)
+        scan_alerts(db)
     finally:
         db.close()
 
