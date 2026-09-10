@@ -46,7 +46,48 @@ AI 问答助手采用**「规则化意图识别 + 模板回答」作为兜底**�
 
 ---
 
-## 二、问答对测试范例
+## 二、问答路由技能库（Skill）与 SSE 流式
+
+### 1. 技能库层级
+
+AI 问答助手内置「问答路由技能库」（`app/services/skill_registry.py`），层级为 **领域 → 技能 → 数据源**，覆盖全部业务功能：
+
+| 领域 | 技能 | 数据源（API / 表 / MCP） |
+|---|---|---|
+| 测算与建议 | 备货建议 | `calc_result` 表 / `GET /api/suggestions` / `sku_master` |
+| 预警中心 | 断货预测 | `calc_result` / `GET /api/alerts?type=缺货` / `inventory_snapshot` |
+| 预警中心 | 滞销分析 | `GET /api/alerts?type=滞销` / `inventory_snapshot` |
+| 设置中心 | 大促排期 | `settings.promotion_calendar` |
+| 采购管理 | 采购计划 | `GET/POST /api/purchase-orders` / `purchase_order` 表 |
+| 采购管理 | 预算查询 | `settings.monthly_budget` / `purchase_order(draft)` |
+
+> 数据源类型：`api`（REST 接口）、`table`（数据库表）、`mcp`（MCP 工具，预留扩展）。
+
+### 2. 路由策略
+
+```
+用户问题 → 关键词匹配技能库 → 拉取对应数据(API/表) → 组装「数据 + 关键词」上下文 → LLM 生成回答
+```
+
+### 3. SSE 流式 + 思考过程
+
+- 端点：`POST /api/chat/stream`（`text/event-stream`）。
+- 事件序列：`thinking`（思考过程）→ `token`（流式回答）→ `llm`（模型/fallback）→ `meta`（chips/actions）→ `done`。
+- 前端「AI 问答助手」页实时流式展示，**思考过程可点击箭头收纳/展开**。
+
+**思考过程示例**（问题「本周要补什么货？」）：
+
+```
+[意图识别] 命中技能「备货建议」（测算与建议）
+[命中关键词] 要补
+[可查询数据源] calc_result；GET /api/suggestions；sku_master
+[数据摘要] 拉取 5 条结构化数据
+[调用模型] deepseek-v4-flash
+```
+
+---
+
+## 三、问答对测试范例
 
 > 触发方式：`POST /api/chat`，body `{"text": "<问题>"}`。前端入口「AI 问答助手」页。
 
@@ -75,7 +116,7 @@ curl -X POST http://localhost:8000/api/chat \
 
 ---
 
-## 三、快速开始
+## 四、快速开始
 
 ```bash
 # 后端
