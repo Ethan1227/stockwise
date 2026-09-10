@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+**/__pycache__
+**/*.pyc
+**/*.pytest_cache
+data/*.db
+frontend/node_modules
+frontend/dist
+.idea
+.vscode
+verify/last.log
+验收报告.md
+FAILED.flag
+*.md
