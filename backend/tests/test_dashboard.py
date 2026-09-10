@@ -46,3 +46,18 @@ def test_summary():
     assert "大促" in todo_types
     black_friday = next(t for t in data["todos"] if t["type"] == "大促")
     assert "倒计时" in black_friday["text"]
+
+
+def test_calc_history():
+    with TestClient(app) as client:
+        r = client.get("/api/calc/history")
+        assert r.status_code == 200
+        dates = r.json()["data"]
+        assert len(dates) >= 1
+        assert dates[0]["count"] == 8
+
+        r = client.get("/api/calc/history/SK-2087")
+        assert r.status_code == 200
+        rows = r.json()["data"]
+        assert len(rows) >= 1
+        assert "forecast_daily" in rows[0] and "score" in rows[0]

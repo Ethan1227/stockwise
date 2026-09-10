@@ -58,6 +58,7 @@ def get_suggestions(db: Session, platform: str | None = None, score_band: str | 
             "score_band": cr.score_band,
             "score_detail": cr.score_detail_json,
             "reason_text": cr.reason_text,
+            "data_flags": cr.data_flags,
             "adjusted_qty": adjusted_qty,
             "is_adjusted": is_adjusted,
             "is_ignored": is_ignored,

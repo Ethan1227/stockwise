@@ -66,11 +66,13 @@ def calc_one(db, sku: SkuMaster, settings: dict, today: date) -> CalcResult:
 
     factors: dict = {}
     reasons: list[str] = []
+    missing_signals: list[str] = []
     for code in ALL_MODIFIER_CODES:
         mod = registry.get(code)
         if mod is None:  # 已注销 -> 按 1.0 降级
             factors[code] = 1.0
             reasons.append(f"{code} 信号缺失（已注销）")
+            missing_signals.append(code)
             continue
         try:
             coeff, reason = mod.factor(sku, ctx)
@@ -79,6 +81,8 @@ def calc_one(db, sku: SkuMaster, settings: dict, today: date) -> CalcResult:
         factors[code] = coeff
         if reason:
             reasons.append(reason)
+        if "缺失" in reason:
+            missing_signals.append(code)
 
     forecast = base_daily
     for c in factors.values():
@@ -110,7 +114,7 @@ def calc_one(db, sku: SkuMaster, settings: dict, today: date) -> CalcResult:
     obj.factors_json = factors
     obj.score_detail_json = detail
     obj.reason_text = "；".join(reasons)
-    obj.data_flags = {}
+    obj.data_flags = {"missing_signals": missing_signals}
     return obj
 
 

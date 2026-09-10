@@ -86,6 +86,7 @@ def test_unregister_trend_degrades_to_1(db):
         result = db.query(CalcResult).filter_by(sku="SK-1023", calc_date=today).first()
         assert result.factors_json["trend"] == 1.0
         assert "信号缺失" in result.reason_text
+        assert "trend" in result.data_flags["missing_signals"]
     finally:
         # 恢复注册
         import importlib
