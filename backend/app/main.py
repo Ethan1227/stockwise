@@ -9,17 +9,13 @@ import app.models  # noqa: F401  # 注册全部模型
 from app.api import alerts, calc, chat, dashboard, health, imports, purchase_orders, suggestions
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
-from app.core.scheduler import scheduler, start_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 首次启动自动建表
+    # 首次启动自动建表（调度已拆分为独立进程 app.scheduler_worker）
     Base.metadata.create_all(bind=engine)
-    start_scheduler()
     yield
-    if scheduler.running:
-        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="智备货 StockWise", version="1.0.0", lifespan=lifespan)
