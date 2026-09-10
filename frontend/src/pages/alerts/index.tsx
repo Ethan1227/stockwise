@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getRules, listAlerts, updateAlert, updateRules } from '../../api/alerts'
 
 const LEVEL_STYLE: Record<string, string> = {
@@ -24,6 +25,7 @@ const RULE_LABELS: Record<string, string> = {
 
 export function Alerts() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [type, setType] = useState('')
   const [rules, setRules] = useState<Record<string, number>>({})
   const [rulesDirty, setRulesDirty] = useState(false)
@@ -97,6 +99,11 @@ export function Alerts() {
             <div className="flex flex-col gap-2 justify-center">
               {a.status === '未处理' ? (
                 <>
+                  {a.alert_type === '缺货' && (
+                    <button onClick={() => navigate(`/purchase?skus=${a.sku}`)} className="text-xs rounded-lg bg-primary text-white px-3 py-1.5 hover:opacity-90">
+                      生成采购单
+                    </button>
+                  )}
                   <button onClick={() => updateMutation.mutate({ id: a.id, status: '已处理' })} className="text-xs rounded-lg bg-primary/10 text-primary px-3 py-1.5 hover:bg-primary/20">
                     标记处理
                   </button>

@@ -49,3 +49,16 @@ export function arriveOrder(id: number) {
 export function deleteOrder(id: number) {
   return request(`/api/purchase-orders/${id}`, { method: 'DELETE' })
 }
+
+export function createManualOrder(body: {
+  supplier: string
+  dest_warehouse: string
+  status: string
+  items: { sku: string; qty: number; unit_cost: number }[]
+}) {
+  return request<PurchaseOrder>('/api/purchase-orders/manual', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Suggestion } from '../../api/suggestions'
 import { listSuggestions, triggerCalc, updateSuggestion } from '../../api/suggestions'
 import { ScoreBadge } from '../../components/ui/Badge'
@@ -9,8 +10,10 @@ const PLATFORMS = ['亚马逊', '沃尔玛', '双平台']
 
 export function Suggestions() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [platform, setPlatform] = useState('')
   const [scoreBand, setScoreBand] = useState('')
+  const [selectedSkus, setSelectedSkus] = useState<string[]>([])
   const [selected, setSelected] = useState<Suggestion | null>(null)
   const [adjustQty, setAdjustQty] = useState('')
   const [toast, setToast] = useState('')
@@ -46,6 +49,14 @@ export function Suggestions() {
     window.location.href = '/api/suggestions/export'
   }
 
+  function toggleSku(sku: string) {
+    setSelectedSkus((s) => (s.includes(sku) ? s.filter((x) => x !== sku) : [...s, sku]))
+  }
+
+  function generatePurchase() {
+    if (selectedSkus.length) navigate(`/purchase?skus=${selectedSkus.join(',')}`)
+  }
+
   return (
     <div>
       {toast && (
@@ -73,6 +84,9 @@ export function Suggestions() {
         <button onClick={exportExcel} className="rounded-lg border border-card-border bg-card text-ink px-4 py-2 text-sm hover:bg-bg">
           导出 Excel
         </button>
+        <button onClick={generatePurchase} disabled={selectedSkus.length === 0} className="rounded-lg bg-primary text-white px-4 py-2 text-sm hover:opacity-90 disabled:opacity-40">
+          生成采购 ({selectedSkus.length})
+        </button>
       </div>
 
       {/* 表格 */}
@@ -80,6 +94,7 @@ export function Suggestions() {
         <table className="w-full text-sm">
           <thead className="bg-bg/60 text-sub text-left">
             <tr>
+              <th className="px-4 py-3 w-10"></th>
               <th className="px-4 py-3 font-medium">SKU</th>
               <th className="px-4 py-3 font-medium">品名</th>
               <th className="px-4 py-3 font-medium">平台</th>
@@ -93,6 +108,9 @@ export function Suggestions() {
           <tbody className="divide-y divide-card-border">
             {rows?.map((r) => (
               <tr key={r.sku} className="hover:bg-bg/40 cursor-pointer" onClick={() => setSelected(r)}>
+                <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                  <input type="checkbox" checked={selectedSkus.includes(r.sku)} onChange={() => toggleSku(r.sku)} />
+                </td>
                 <td className="px-4 py-3 font-medium text-ink">{r.sku}</td>
                 <td className="px-4 py-3 text-ink">
                   {r.name}
