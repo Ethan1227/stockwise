@@ -8,6 +8,7 @@ from app.models.suggestion_override import SuggestionOverride
 from app.models.alert import Alert
 from app.models.purchase_order import PurchaseOrder
 from app.models.setting import Setting
+from app.models.import_log import ImportLog
 
 __all__ = [
     "SkuMaster",
@@ -19,4 +20,5 @@ __all__ = [
     "Alert",
     "PurchaseOrder",
     "Setting",
+    "ImportLog",
 ]

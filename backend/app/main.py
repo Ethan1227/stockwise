@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import app.models  # noqa: F401  # 注册全部模型
-from app.api import health
+from app.api import health, imports
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
 
@@ -39,3 +39,4 @@ async def business_error_handler(request, exc: BusinessError):
 
 
 app.include_router(health.router, prefix="/api")
+app.include_router(imports.router, prefix="/api")
