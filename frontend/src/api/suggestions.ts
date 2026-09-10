@@ -22,6 +22,7 @@ export interface Suggestion {
   score_band: string
   score_detail: Record<string, ScoreDetail>
   reason_text: string
+  data_flags: { missing_signals: string[] }
   adjusted_qty: number | null
   is_adjusted: boolean
   is_ignored: boolean

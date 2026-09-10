@@ -157,6 +157,11 @@ export function Suggestions() {
                 </div>
               ))}
             </div>
+            {selected.data_flags?.missing_signals?.length > 0 && (
+              <div className="mb-4 rounded-lg bg-warning/10 text-warning text-xs px-3 py-2">
+                数据降级：{selected.data_flags.missing_signals.join('、')} 信号缺失，已按 1.0 处理
+              </div>
+            )}
             <div className="mb-4">
               <div className="text-sm text-sub mb-1">测算依据</div>
               <p className="text-sm text-ink leading-relaxed">{selected.reason_text || '—'}</p>
