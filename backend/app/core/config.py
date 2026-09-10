@@ -41,8 +41,9 @@ DEFAULT_SETTINGS = {
     # 四修正器档位
     "modifier_tiers": {
         "trend": {"strong_up": 1.2, "up": 1.1, "flat": 1.0, "down": 0.9},
+        "trend_pct": {"strong_up": 30, "up": 10, "down": -10},
         "competitor": {"stockout": 0.1, "price_cut": -0.1},
-        "event": {"hot": 1.3, "near": 1.1},
+        "event": {"hot": 1.3, "near": 1.1, "hot_ratio": 1.3},
         "env": {"min": 0.9, "max": 1.1},
     },
     # 大促日历（与 promotion_calendar.csv 一致；seed 时以 CSV 为准覆盖）

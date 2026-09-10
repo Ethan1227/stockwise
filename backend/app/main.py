@@ -6,16 +6,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 import app.models  # noqa: F401  # 注册全部模型
-from app.api import health, imports
+from app.api import calc, health, imports
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
+from app.core.scheduler import scheduler, start_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 首次启动自动建表
     Base.metadata.create_all(bind=engine)
+    start_scheduler()
     yield
+    if scheduler.running:
+        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="智备货 StockWise", version="1.0.0", lifespan=lifespan)
@@ -40,3 +44,4 @@ async def business_error_handler(request, exc: BusinessError):
 
 app.include_router(health.router, prefix="/api")
 app.include_router(imports.router, prefix="/api")
+app.include_router(calc.router, prefix="/api")
