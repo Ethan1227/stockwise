@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import type { ChatAction, ChatChip, ThinkingStep } from '../../api/chat'
 import { streamChat } from '../../api/chat'
 
@@ -22,8 +22,16 @@ const SUGGESTIONS = [
 
 export function Chat() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
+
+  // 从测试配置中心跳转时预填问题
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q) setInput(q)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const patchLast = (fn: (m: Message) => Message) =>
     setMessages((ms) => ms.map((x, i) => (i === ms.length - 1 ? fn(x) : x)))
