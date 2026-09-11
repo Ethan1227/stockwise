@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { Sidebar } from './components/layout/Sidebar'
 import { Topbar } from './components/layout/Topbar'
@@ -12,16 +13,17 @@ import { Settings } from './pages/settings'
 
 export default function App() {
   const { pathname } = useLocation()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const current = menuItems.find((m) =>
     m.path === '/' ? pathname === '/' : pathname.startsWith(m.path),
   )
 
   return (
     <div className="min-h-screen bg-bg">
-      <Sidebar />
-      <div className="ml-60">
-        <Topbar title={current?.label ?? ''} subtitle="智备货 StockWise" />
-        <main className="p-6">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="md:ml-60">
+        <Topbar title={current?.label ?? ''} subtitle="智备货 StockWise" onMenuClick={() => setSidebarOpen(true)} />
+        <main className="p-4 md:p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/datacenter" element={<DataCenter />} />

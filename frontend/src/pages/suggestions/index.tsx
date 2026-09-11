@@ -90,8 +90,8 @@ export function Suggestions() {
       </div>
 
       {/* 表格 */}
-      <div className="bg-card border border-card-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-card border border-card-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead className="bg-bg/60 text-sub text-left">
             <tr>
               <th className="px-4 py-3 w-10"></th>
@@ -138,7 +138,7 @@ export function Suggestions() {
       {selected && (
         <div className="fixed inset-0 z-50" onClick={() => setSelected(null)}>
           <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute right-0 top-0 h-full w-96 bg-card shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute right-0 top-0 h-full w-full md:w-96 bg-card shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-ink">{selected.sku} {selected.name}</h3>
               <button onClick={() => setSelected(null)} className="text-sub hover:text-ink">✕</button>

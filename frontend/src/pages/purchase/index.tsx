@@ -185,7 +185,7 @@ export function Purchase() {
       {manualOpen && (
         <div className="fixed inset-0 z-50" onClick={() => setManualOpen(false)}>
           <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute right-0 top-0 h-full w-96 bg-card shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute right-0 top-0 h-full w-full md:w-96 bg-card shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-ink">手工补录采购单</h3>
               <button onClick={() => setManualOpen(false)} className="text-sub hover:text-ink">✕</button>
