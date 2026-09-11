@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 import app.models  # noqa: F401  # 注册全部模型
 from app.api import alerts, calc, chat, dashboard, health, imports, purchase_orders, settings, skus, suggestions
+from app.api import eval as eval_api
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
 from app.core.feature_flags import check_feature
@@ -49,3 +50,4 @@ app.include_router(dashboard.router, prefix="/api", dependencies=[Depends(check_
 app.include_router(chat.router, prefix="/api", dependencies=[Depends(check_feature("chat"))])
 app.include_router(skus.router, prefix="/api", dependencies=[Depends(check_feature("settings"))])
 app.include_router(settings.router, prefix="/api", dependencies=[Depends(check_feature("settings"))])
+app.include_router(eval_api.router, prefix="/api")  # 评测指标不设开关
