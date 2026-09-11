@@ -48,3 +48,15 @@ def test_eval_metrics():
     # 各指标字段齐全
     for k in ["accuracy", "precision", "recall", "f1"]:
         assert k in data["intent"]
+
+
+def test_eval_ragas():
+    with TestClient(app) as client:
+        r = client.get("/api/eval/ragas")
+    assert r.status_code == 200
+    data = r.json()["data"]
+    assert {"faithfulness", "answer_relevancy", "context_precision", "context_recall"} <= set(data.keys())
+    for v in data.values():
+        assert 0.0 <= v <= 1.0
+    # 意图路由是确定性的，命中正确率应为 1.0
+    assert data["context_precision"] == 1.0
