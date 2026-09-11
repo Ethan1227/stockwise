@@ -1,7 +1,7 @@
 """FastAPI 入口：只挂 router，统一异常与响应格式。"""
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -9,6 +9,7 @@ import app.models  # noqa: F401  # 注册全部模型
 from app.api import alerts, calc, chat, dashboard, health, imports, purchase_orders, settings, skus, suggestions
 from app.core.db import Base, engine
 from app.core.exceptions import BusinessError
+from app.core.feature_flags import check_feature
 
 
 @asynccontextmanager
@@ -38,13 +39,13 @@ async def business_error_handler(request, exc: BusinessError):
     )
 
 
-app.include_router(health.router, prefix="/api")
-app.include_router(imports.router, prefix="/api")
-app.include_router(calc.router, prefix="/api")
-app.include_router(suggestions.router, prefix="/api")
-app.include_router(alerts.router, prefix="/api")
-app.include_router(purchase_orders.router, prefix="/api")
-app.include_router(dashboard.router, prefix="/api")
-app.include_router(chat.router, prefix="/api")
-app.include_router(skus.router, prefix="/api")
-app.include_router(settings.router, prefix="/api")
+app.include_router(health.router, prefix="/api")  # 健康检查不设开关
+app.include_router(imports.router, prefix="/api", dependencies=[Depends(check_feature("datacenter"))])
+app.include_router(calc.router, prefix="/api", dependencies=[Depends(check_feature("engine"))])
+app.include_router(suggestions.router, prefix="/api", dependencies=[Depends(check_feature("suggestion"))])
+app.include_router(alerts.router, prefix="/api", dependencies=[Depends(check_feature("alert"))])
+app.include_router(purchase_orders.router, prefix="/api", dependencies=[Depends(check_feature("purchase"))])
+app.include_router(dashboard.router, prefix="/api", dependencies=[Depends(check_feature("dashboard"))])
+app.include_router(chat.router, prefix="/api", dependencies=[Depends(check_feature("chat"))])
+app.include_router(skus.router, prefix="/api", dependencies=[Depends(check_feature("settings"))])
+app.include_router(settings.router, prefix="/api", dependencies=[Depends(check_feature("settings"))])

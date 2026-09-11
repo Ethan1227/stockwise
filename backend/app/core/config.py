@@ -68,4 +68,15 @@ DEFAULT_SETTINGS = {
         "to": [],
     },
     "email_digest_hour": 18,  # 一般/滞销预警邮件汇总发送时间
+    # 功能开关（测试配置中心「权限分配」）
+    "feature_flags": {
+        "datacenter": True,
+        "engine": True,
+        "suggestion": True,
+        "alert": True,
+        "purchase": True,
+        "dashboard": True,
+        "chat": True,
+        "settings": True,
+    },
 }

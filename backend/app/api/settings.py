@@ -22,3 +22,19 @@ def put_settings(body: dict, db: Session = Depends(get_db)):
         upsert_setting(db, key, value)
     db.commit()
     return ok(load_settings(db))
+
+
+@router.get("/settings/flags")
+def get_flags(db: Session = Depends(get_db)):
+    """功能开关读取。"""
+    return ok(load_settings(db).get("feature_flags", {}))
+
+
+@router.put("/settings/flags")
+def put_flags(body: dict, db: Session = Depends(get_db)):
+    """功能开关更新（部分覆盖）。"""
+    current = dict(load_settings(db).get("feature_flags", {}))
+    current.update(body)
+    upsert_setting(db, "feature_flags", current, "功能开关")
+    db.commit()
+    return ok(current)
